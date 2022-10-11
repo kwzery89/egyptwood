@@ -15,7 +15,6 @@ class ResPartner(models.Model):
     last_invoice = fields.Monetary(string="Last Invoice", readonly=True, compute="get_last_invoice", copy=False)
     last_invoice_date = fields.Date(string="Last Invoice Date", readonly=True, compute="get_last_invoice", copy=False)
 
-    @api.multi
     def get_last_payment(self):
         for partner in self:
             payments_ids = self.env['account.payment'].search([('partner_id', '=', partner.id), ('state', '=', 'posted')])
@@ -24,7 +23,6 @@ class ResPartner(models.Model):
                 partner.last_payment_date = payment.payment_date
                 partner.last_payment = payment.amount
 
-    @api.multi
     def get_last_invoice(self):
         for partner in self:
             invoice_ids = self.env['account.invoice'].search([('partner_id', '=', partner.id),
