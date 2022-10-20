@@ -8,14 +8,13 @@ from dateutil import relativedelta
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    last_payment = fields.Monetary(string="Last Payment", readonly=True, store=True, compute="get_last_payment",
+    last_payment = fields.Monetary(string="Last Payment", readonly=True,compute="get_last_payment",
                                    copy=False)
-    last_payment_date = fields.Date(string="Last Payment Date", readonly=True, store=True, compute="get_last_payment",
+    last_payment_date = fields.Date(string="Last Payment Date", readonly=True,compute="get_last_payment",
                                     copy=False)
-    last_invoice = fields.Monetary(string="Last Invoice", readonly=True, store=True, compute="get_last_invoice", copy=False)
-    last_invoice_date = fields.Date(string="Last Invoice Date", readonly=True, store=True, compute="get_last_invoice", copy=False)
+    last_invoice = fields.Monetary(string="Last Invoice", readonly=True,  compute="get_last_invoice", copy=False)
+    last_invoice_date = fields.Date(string="Last Invoice Date", readonly=True, compute="get_last_invoice", copy=False)
 
-    @api.depends('name')
     def get_last_payment(self):
         for partner in self:
             payments_ids = self.env['account.payment'].search(
@@ -24,8 +23,10 @@ class ResPartner(models.Model):
             if payment:
                 partner.last_payment_date = payment.payment_date
                 partner.last_payment = payment.amount
+            else:
+                partner.last_payment_date = 0
+                partner.last_payment = 0
 
-    @api.depends('name')
     def get_last_invoice(self):
         for partner in self:
             invoice_ids = self.env['account.move'].search([('partner_id', '=', partner.id),
@@ -34,4 +35,7 @@ class ResPartner(models.Model):
             if invoice:
                 partner.last_invoice = invoice.amount_total
                 partner.last_invoice_date = invoice.invoice_date
+            else:
+                partner.last_invoice = 0
+                partner.last_invoice_date = 0
 
