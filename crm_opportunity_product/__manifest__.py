@@ -6,7 +6,7 @@
 	"website": "http://www.pptssolutions.com",
 	"sequence": 5,
 	"depends": [
-		"base",'sale_crm','sale','product','so_contract', 'hr'
+		"base",'sale_crm','sale','product', 'hr'
 	],
 	"category": "Settings",
 	"complexity": "easy",
