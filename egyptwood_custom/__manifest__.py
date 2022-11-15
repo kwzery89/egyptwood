@@ -18,7 +18,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['crm', 'purchase', 'stock'],
+    'depends': ['crm', 'purchase', 'stock', 'sale'],
 
     # always loaded
     'data': [

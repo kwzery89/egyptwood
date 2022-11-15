@@ -2,6 +2,23 @@
     <data>
 
         <!-- Inherit Form View to Modify it -->
+        <record id="sale_order_rate" model="ir.ui.view">
+            <field name="name">sale.order.rate</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="so_rate"/>
+                    <field name="total_rate"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+
+        <!-- Inherit Form View to Modify it -->
         <record id="crm_lead_products" model="ir.ui.view">
             <field name="name">crm.lead.products</field>
             <field name="model">crm.lead</field>
@@ -39,6 +56,11 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="for_in"/>
                 </xpath>
+                <xpath expr="//field[@name='currency_id']" position="after">
+                    <field name="so_rate"/>
+                    <field name="total_rate"/>
+                </xpath>
+
 
             </field>
         </record>
@@ -97,6 +119,8 @@
                             <group>
                                 <field name="partner_id"  attrs="{'readonly': [('state', '!=', 'production')]}"/>
                                 <field name="currency_id"  attrs="{'readonly': [('state', '!=', 'production')]}"/>
+                                <field name="total_rate"  attrs="{'readonly': [('state', '!=', 'production')]}"/>
+                                <field name="so_rate"  attrs="{'readonly': [('state', '!=', 'production')]}"/>
                             </group>
                             <group>
                                 <field name="date_planned"  attrs="{'readonly': [('state', '!=', 'production')]}"/>

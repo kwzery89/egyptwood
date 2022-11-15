@@ -24,6 +24,18 @@ class PurchaseOrderFor(models.Model):
 
     for_in = fields.Boolean(string="Foreign", )
 
+    total_rate = fields.Float(string="Total Company Rate", store=True, compute='_compute_total_rate', )
+    so_rate = fields.Float(string="Rate", required=False, )
+
+    @api.depends('so_rate', 'amount_total')
+    def _compute_total_rate(self):
+        for rec in self:
+            if rec.so_rate:
+                rec.total_rate = rec.so_rate * rec.amount_total
+            else:
+                rec.total_rate = 0
+
+
 
 class ForinPurchase(models.Model):
     _name = 'forin.purchase'
@@ -58,6 +70,19 @@ class ForinPurchase(models.Model):
     picking_count = fields.Integer(compute='compute_picking_count')
     purchase_count = fields.Integer(compute='compute_purchase_count')
     account_count = fields.Integer(compute='compute_account_count')
+    total_rate = fields.Float(string="Total Company Rate", store=True, compute='_compute_total_rate', )
+    so_rate = fields.Float(string="Rate", required=False, )
+
+    @api.depends('so_rate', 'forin_lines_ids')
+    def _compute_total_rate(self):
+        for rec in self:
+            total_lines = 0
+            for line in rec.forin_lines_ids:
+                total_lines += line.price_subtotal
+            if rec.so_rate:
+                rec.total_rate = rec.so_rate * total_lines
+            else:
+                rec.total_rate = 0
 
     def compute_picking_count(self):
         for record in self:
@@ -123,7 +148,7 @@ class ForinPurchase(models.Model):
                 'partner_id': self.partner_id.id,
                 'currency_id': self.currency_id.id,
                 'invoice_date': self.date_planned.date(),
-                'move_type':  'in_invoice',
+                'move_type': 'in_invoice',
             })
             for line in self.forin_lines_ids:
                 stock_obj.update({'move_ids_without_package': [(0, 0, {'name': line.product_id.name,
@@ -135,9 +160,9 @@ class ForinPurchase(models.Model):
                                                                        'quantity_done': line.product_qty,
                                                                        'product_uom_qty': line.product_qty})]})
                 account_obj.update({'invoice_line_ids': [(0, 0, {'name': line.product_id.name,
-                                                               'product_id': line.product_id.id,
-                                                               'price_unit': line.price_unit,
-                                                               'quantity': line.product_qty})]})
+                                                                 'product_id': line.product_id.id,
+                                                                 'price_unit': line.price_unit,
+                                                                 'quantity': line.product_qty})]})
             stock_obj.action_confirm()
             stock_obj.button_validate()
             account_obj.action_post()
@@ -198,3 +223,19 @@ class StockPickingChecks(models.Model):
 
     is_transients = fields.Boolean(string="Transient", )
     is_senders = fields.Boolean(string="Sender", )
+
+
+class SaleOrderRate(models.Model):
+    _inherit = 'sale.order'
+
+    total_rate = fields.Float(string="Total Company Rate", store=True, compute='_compute_total_rate', )
+    so_rate = fields.Float(string="Rate", required=False, )
+
+    @api.depends('so_rate', 'amount_total')
+    def _compute_total_rate(self):
+        for rec in self:
+            if rec.so_rate:
+                rec.total_rate = rec.so_rate * rec.amount_total
+            else:
+                rec.total_rate = 0
+
